@@ -33,7 +33,7 @@ module ElasticAPM
               db: { statement: command.join(' ') }
             )
 
-            ElasticAPM.with_span(command.first(2).join(' '), 'db', subtype: 'redis', action: command[0].upcase, context: context) do
+            ElasticAPM.with_span(command.first.upcase, 'db', subtype: 'redis', action: command[0].upcase, context: context) do
               call_without_apm(command, &block)
             end
           end
