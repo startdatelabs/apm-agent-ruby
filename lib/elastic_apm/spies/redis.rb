@@ -27,11 +27,13 @@ module ElasticAPM
           alias call_without_apm call
 
           def call(command, &block)
-            name = command[0].upcase
-
             return call_without_apm(command, &block) if command[0] == :auth
 
-            ElasticAPM.with_span(name.to_s, 'db.redis') do
+            context = ::ElasticAPM::Span::Context.new(
+              db: { statement: command.join(' ') }
+            )
+
+            ElasticAPM.with_span(command.first(2).join(' '), 'db', subtype: 'redis', action: command[0].upcase, context: context) do
               call_without_apm(command, &block)
             end
           end
